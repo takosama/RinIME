@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup><OutputType>Exe</OutputType><TargetFramework>net10.0</TargetFramework><ImplicitUsings>enable</ImplicitUsings><Nullable>enable</Nullable></PropertyGroup>
+  <ItemGroup><Compile Include="../../NyaIme/OfflineKanaKanjiEngine.cs" Link="OfflineKanaKanjiEngine.cs" /></ItemGroup>
+  <ItemGroup><Compile Include="../../NyaIme/ConversionRouting.cs" Link="ConversionRouting.cs" /></ItemGroup>
+  <ItemGroup>
+    <Compile Include="../../NyaIme/CompositionRange.cs" Link="CompositionRange.cs" />
+    <Compile Include="../../NyaIme/ConversionModeState.cs" Link="ConversionModeState.cs" />
+    <Compile Include="../../NyaIme/CompositionCommitter.cs" Link="CompositionCommitter.cs" />
+  </ItemGroup>
+  <ItemGroup><Compile Include="../../NyaIme/KanaKanjiClient.cs" Link="KanaKanjiClient.cs" /></ItemGroup>
+</Project>

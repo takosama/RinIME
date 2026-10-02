@@ -1,0 +1,79 @@
+{
+  "repository": "https://github.com/google/mozc",
+  "observedCommit": "a069a88d4cb5c011de0f9aebb6c149a1c808d904",
+  "retrievedUtc": "2026-09-30",
+  "format": "RNK1 gzip; full word entries and Int16 transition matrix",
+  "dictionarySha256": "91BD12566C8565C504B665730F3C911CCF475149E407EFEA71B45CB8B891BE30",
+  "files": [
+    {
+      "name": "connection_single_column.txt",
+      "size": 36428642,
+      "sha256": "68823A1F6617372CCB89AFDBCB334D7A0BCFA82C9C5DDA03FC1F80F1CAB5C48E"
+    },
+    {
+      "name": "dictionary00.txt",
+      "size": 7157174,
+      "sha256": "9E07CE292932C4FFF327ED8CB06274C09ACCA556BD8BDF7C7EF1F6173EAE3B61"
+    },
+    {
+      "name": "dictionary01.txt",
+      "size": 6428663,
+      "sha256": "836FD5FD8399510DE0D8EF7B33BE913CCA6BBAEE7B712CC8045FBA03F4C75A89"
+    },
+    {
+      "name": "dictionary02.txt",
+      "size": 6480134,
+      "sha256": "93943858D0CFD092B849A78DEF6901EAF228177E1AC5663544E865A3A1E45A9E"
+    },
+    {
+      "name": "dictionary03.txt",
+      "size": 7434257,
+      "sha256": "CB9F1B0B4A7550D682D86244A021CD17E0B15366328819E69135B5F183A1A24B"
+    },
+    {
+      "name": "dictionary04.txt",
+      "size": 5399172,
+      "sha256": "9FDC4E3948D03463DE13AB5782ADFFBC11DD06E934CB80138C5920029CD3D2F6"
+    },
+    {
+      "name": "dictionary05.txt",
+      "size": 5316454,
+      "sha256": "199E3B0F050B691823AE7BA943090D437F51AF6436B27C5F3DC69CAFA12000E4"
+    },
+    {
+      "name": "dictionary06.txt",
+      "size": 5373350,
+      "sha256": "B95B14F7770AE2A824BC8E9FAD8B03C1BC45C504F93A36554B8B56DAA0368D2A"
+    },
+    {
+      "name": "dictionary07.txt",
+      "size": 5315756,
+      "sha256": "7F53649B529D4C8C495D3A8DD9C4D489DFE7696080F7423107FF01331174BE48"
+    },
+    {
+      "name": "dictionary08.txt",
+      "size": 4887114,
+      "sha256": "50A31BB5FC1646721B00BE371A5695DFFAB1292BDA143E1E59CC70CBBDD8643F"
+    },
+    {
+      "name": "dictionary09.txt",
+      "size": 6690572,
+      "sha256": "4E5FCD4CBFBF11395166A37B506F547FC54D20EDC0884F5184ECD3FC705F0D9A"
+    },
+    {
+      "name": "id.def",
+      "size": 151747,
+      "sha256": "07A05A268C3783B7E02B36E4AA591555A2DD19A1F3C93891576740761C154F2D"
+    },
+    {
+      "name": "README.md",
+      "size": 1516,
+      "sha256": "A05A67759C983E5E53D7634F2F5ED71531233E51B2CEA0F8C404DFED3323C129"
+    },
+    {
+      "name": "README.txt",
+      "size": 5750,
+      "sha256": "6B1DE66BC6FA30E0B45DC45B8C8F6C57BD78AFF923C261A3EFFFAC8EB86F7BAC"
+    }
+  ]
+}

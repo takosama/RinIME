@@ -1,0 +1,21 @@
+name: CPU regression checks
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  checks:
+    runs-on: windows-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - name: Prepare pinned Mozc dictionary
+        shell: pwsh
+        run: ./tools/PrepareDictionary.ps1
+      - name: Run regression suite without external AI calls
+        shell: pwsh
+        run: dotnet run --project tests/OfflineChecks -- NyaIme/Assets/offline-dictionary.gz

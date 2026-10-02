@@ -1,0 +1,12 @@
+<Solution>
+  <Configurations>
+    <Platform Name="Any CPU" />
+    <Platform Name="ARM32" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Project Path="NyaIme.csproj">
+    <Platform Solution="*|x86" Project="x86" />
+    <Platform Solution="Release|ARM32" Project="ARM32" />
+    <Deploy />
+  </Project>
+</Solution>
