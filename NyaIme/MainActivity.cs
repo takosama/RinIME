@@ -32,7 +32,7 @@ namespace NyaIme
             string selected = Android.Provider.Settings.Secure.GetString(ContentResolver,
                 Android.Provider.Settings.Secure.DefaultInputMethod) ?? "";
             _imeStatus.Text = selected.StartsWith(PackageName + "/", StringComparison.Ordinal)
-                ? "RinIME オフライン 1.5 が選択されています。"
+                ? "RinIME オフライン 1.6 が選択されています。"
                 : selected.StartsWith("com.companyname.NyaIme/", StringComparison.Ordinal)
                     ? "旧版のRinIMEが選択されています。「RinIME オフライン」を選んでください。"
                     : "別のキーボードが選択されています。「RinIME オフライン」を選んでください。";
@@ -50,7 +50,7 @@ namespace NyaIme
             root.Orientation =
                 Orientation.Vertical;
 
-            root.AddView(new TextView(this) { Text = "RinIME オフライン 1.5", TextSize = 20 });
+            root.AddView(new TextView(this) { Text = "RinIME オフライン 1.6", TextSize = 20 });
             _imeStatus = new TextView(this);
             root.AddView(_imeStatus);
 
@@ -101,7 +101,9 @@ namespace NyaIme
                 Text = "まずIME設定で「RinIME オフライン」を有効にし、「入力方法を選ぶ」で選択してください。\n" +
                        "キーボード左上の「オフ／ライン」（2行表示）と「AI」で切替。オフラインでは入力を送信しません。\n" +
                        "候補をタップして確定。「予測:」は語尾まで補完します。元のかなも候補に残ります。\n" +
-                       "カーソル左側を変換し、右側は残します。範囲選択時は選択部分だけを変換します。",
+                       "カーソル左側を変換し、右側は残します。範囲選択時は選択部分だけを変換します。\n" +
+                       "英字画面のShiftは1回で次の1文字を大文字、2回で大文字固定、もう1回で解除。\n" +
+                       "O（お）キーの下フリックは半角@です。",
             };
             root.AddView(guide);
             var licenses = new Button(this) { Text = "オフライン辞書のライセンス" };

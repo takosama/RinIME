@@ -8,4 +8,8 @@
     <Compile Include="../../NyaIme/CompositionCommitter.cs" Link="CompositionCommitter.cs" />
   </ItemGroup>
   <ItemGroup><Compile Include="../../NyaIme/KanaKanjiClient.cs" Link="KanaKanjiClient.cs" /></ItemGroup>
+  <ItemGroup>
+    <Compile Include="../../NyaIme/AlphabetShiftState.cs" Link="AlphabetShiftState.cs" />
+    <Compile Include="../../NyaIme/AlphabetKeyboardLayout.cs" Link="AlphabetKeyboardLayout.cs" />
+  </ItemGroup>
 </Project>

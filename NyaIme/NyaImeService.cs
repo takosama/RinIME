@@ -105,6 +105,9 @@ namespace NyaIme
         private bool _numericMode;
         private bool _emojiMode;
         private bool _halfWidthAlphaMode;
+        private readonly AlphabetShiftState _alphabetShift = new();
+        private readonly List<(TextView Label, string Letter)> _alphabetLabels = new();
+        private Button? _shiftKey;
 
         // 未確定ローマ字
         private string _romajiBuffer = "";
@@ -446,6 +449,7 @@ namespace NyaIme
                 return;
             }
 
+            ResetAlphabetShift();
             _romajiBuffer = "";
             _pendingSecondN = false;
             _composition.Reset();
@@ -460,6 +464,7 @@ namespace NyaIme
 
         public override void OnFinishInput()
         {
+            ResetAlphabetShift();
             if (CurrentInputConnection is not null) FinishNativeComposition(CurrentInputConnection);
             _romajiBuffer = "";
             _pendingSecondN = false;
@@ -535,6 +540,8 @@ namespace NyaIme
 
         public override View OnCreateInputView()
         {
+            _alphabetLabels.Clear();
+            _shiftKey = null;
             var shell =
                 new FrameLayout(this);
 
@@ -738,29 +745,6 @@ namespace NyaIme
             }
         }
 
-        private class FlickData
-        {
-            public string Center;
-            public string Up;
-            public string Left;
-            public string Right;
-            public string Down;
-
-            public FlickData(
-                string center,
-                string up,
-                string left,
-                string right,
-                string down)
-            {
-                Center = center;
-                Up = up;
-                Left = left;
-                Right = right;
-                Down = down;
-            }
-        }
-
         private LinearLayout CreateAlphabetCenter()
         {
             var center =
@@ -769,29 +753,8 @@ namespace NyaIme
             center.Orientation =
                 Orientation.Vertical;
 
-            center.AddView(
-                CreateRow(
-                    new FlickData("A", "X", "C", null, null),
-                    new FlickData("K", "F", null, "G", null),
-                    new FlickData("H", "P", null, "B", null)));
-
-            center.AddView(
-                CreateRow(
-                    new FlickData("Y", null, "L", null, null),
-                    new FlickData("S", null, null, "Z", null),
-                    new FlickData("T", null, null, "D", null)));
-
-            center.AddView(
-                CreateRow(
-                    new FlickData("I", null, "Q", null, null),
-                    new FlickData("N", null, null, "M", null),
-                    new FlickData("R", "J", null, "W", null)));
-
-            center.AddView(
-                CreateRow(
-                    new FlickData("U", null, "V", null, "（"),
-                    new FlickData("E", null, "！", null, ")"),
-                    new FlickData("O", null, "？", "ー", null)));
+            foreach (var row in AlphabetKeyboardLayout.Rows)
+                center.AddView(CreateRow(row[0], row[1], row[2]));
 
             return center;
         }
@@ -867,9 +830,9 @@ namespace NyaIme
         // =========================================================
 
         private View CreateRow(
-            FlickData a,
-            FlickData b,
-            FlickData c)
+            FlickKeyData a,
+            FlickKeyData b,
+            FlickKeyData c)
         {
             var row =
                 new LinearLayout(this);
@@ -903,7 +866,7 @@ namespace NyaIme
         // =========================================================
 
         private View CreateFlickKey(
-            FlickData key)
+            FlickKeyData key)
         {
             var frame =
                 new FrameLayout(this);
@@ -964,7 +927,7 @@ namespace NyaIme
             float startX = 0;
             float startY = 0;
 
-            string currentCandidate =
+            string? currentCandidate =
                 null;
 
             frame.Touch += (_, e) =>
@@ -1015,7 +978,7 @@ namespace NyaIme
                                 ev.GetY() -
                                 startY;
 
-                            string candidate =
+                            string? candidate =
                                 ResolveFlick(
                                     key,
                                     dx,
@@ -1049,7 +1012,7 @@ namespace NyaIme
                                 ev.GetY() -
                                 startY;
 
-                            string output =
+                            string? output =
                                 ResolveFlick(
                                     key,
                                     dx,
@@ -1066,9 +1029,7 @@ namespace NyaIme
                             if (!string.IsNullOrEmpty(
                                 output))
                             {
-                                InputRomaji(
-                                    output
-                                        .ToLowerInvariant());
+                                InputRomaji(output);
                             }
 
                             currentCandidate =
@@ -1110,8 +1071,8 @@ namespace NyaIme
             return frame;
         }
 
-        private string DisplayLetterForCurrentMode(
-            string text)
+        private string? DisplayLetterForCurrentMode(
+            string? text)
         {
             if (!_halfWidthAlphaMode ||
                 string.IsNullOrEmpty(text))
@@ -1119,48 +1080,19 @@ namespace NyaIme
                 return text;
             }
 
-            return text.ToLowerInvariant();
+            return _alphabetShift.Display(text);
         }
 
         // =========================================================
         // フリック方向
         // =========================================================
 
-        private string ResolveFlick(
-            FlickData key,
+        private string? ResolveFlick(
+            FlickKeyData key,
             float dx,
             float dy)
         {
-            float threshold =
-                Dp(FlickThresholdDp);
-
-            float ax =
-                Math.Abs(dx);
-
-            float ay =
-                Math.Abs(dy);
-
-            // 中央
-            if (ax < threshold &&
-                ay < threshold)
-            {
-                return key.Center;
-            }
-
-            // 横
-            if (ax > ay)
-            {
-                if (dx < 0)
-                    return key.Left;
-
-                return key.Right;
-            }
-
-            // 縦
-            if (dy < 0)
-                return key.Up;
-
-            return key.Down;
+            return key.Resolve(dx, dy, Dp(FlickThresholdDp));
         }
 
         // =========================================================
@@ -1169,7 +1101,7 @@ namespace NyaIme
 
         private void AddLabel(
             FrameLayout parent,
-            string text,
+            string? text,
             float textSize,
             GravityFlags gravity)
         {
@@ -1181,6 +1113,9 @@ namespace NyaIme
 
             label.Text =
                 text;
+
+            if (_halfWidthAlphaMode)
+                _alphabetLabels.Add((label, text));
 
             label.TextSize =
                 textSize;
@@ -1221,7 +1156,7 @@ namespace NyaIme
         // =========================================================
 
         private void ShowPreview(
-            string text)
+            string? text)
         {
             if (_flickPreview == null)
                 return;
@@ -1234,7 +1169,7 @@ namespace NyaIme
             else
             {
                 _flickPreview.Text =
-                    text.ToUpperInvariant();
+                    DisplayLetterForCurrentMode(text);
             }
 
             _flickPreview.Visibility =
@@ -1259,8 +1194,8 @@ namespace NyaIme
         {
             if (_halfWidthAlphaMode)
             {
-                InputHalfWidthText(
-                    text.ToLowerInvariant());
+                if (_alphabetShift.TryInput(text, InputHalfWidthText))
+                    RefreshAlphabetShift();
                 return;
             }
 
@@ -1290,17 +1225,18 @@ namespace NyaIme
             ScheduleAutoConversion();
         }
 
-        private void InputHalfWidthText(
+        private bool InputHalfWidthText(
             string text)
         {
             FlushRomaji();
 
-            CommitRaw(text);
+            if (!CommitRaw(text)) return false;
             _composition.Reset();
             _romajiDraftStart = -1; _romajiDraftLength = 0;
             _compositionVersion++;
             _autoConversionVersion++;
             ClearCandidates();
+            return true;
         }
 
         // =========================================================
@@ -1588,19 +1524,19 @@ namespace NyaIme
             finally { _suppressSelectionUpdates = false; }
         }
 
-        private void CommitRaw(string text)
+        private bool CommitRaw(string text)
         {
             var ic = CurrentInputConnection;
-            if (ic is null) return;
+            if (ic is null) return false;
             var selection = GetEditorSelection(ic);
             int first = _romajiDraftStart >= 0 ? _romajiDraftStart : Math.Min(selection.Start, selection.End);
             int last = _romajiDraftStart >= 0 ? first + _romajiDraftLength : Math.Max(selection.Start, selection.End);
             if (first < 0)
             {
-                ic.CommitText(new Java.Lang.String(text), 1);
+                bool committed = ic.CommitText(new Java.Lang.String(text), 1);
                 _composition.Reset();
                 ClearCandidates();
-                return;
+                return committed;
             }
             _suppressSelectionUpdates = true;
             try
@@ -1608,13 +1544,14 @@ namespace NyaIme
                 if (_romajiDraftStart < 0) FinishNativeComposition(ic);
                 else ic.SetComposingRegion(first, last);
                 _lastNativeSpan = null; _nativeRestoreSelectionRevision = -1;
-                if (!ic.CommitText(new Java.Lang.String(text), 1)) return;
+                if (!ic.CommitText(new Java.Lang.String(text), 1)) return false;
                 _composition.ApplyEdit(first, last, text, first + text.Length);
                 _romajiDraftStart = -1; _romajiDraftLength = 0;
                 SyncSelectionPosition();
                 _compositionVersion++;
                 ClearCandidates();
                 RestoreNativeComposition(ic);
+                return true;
             }
             finally { _suppressSelectionUpdates = false; }
         }
@@ -1987,6 +1924,7 @@ namespace NyaIme
 
         private void ToggleNumericMode()
         {
+            ResetAlphabetShift();
             FlushRomaji();
             FinishCurrentConversionSegment();
             _numericMode = true;
@@ -1996,6 +1934,7 @@ namespace NyaIme
 
         private void ToggleEmojiMode()
         {
+            ResetAlphabetShift();
             FlushRomaji();
             FinishCurrentConversionSegment();
             _numericMode = true;
@@ -2014,6 +1953,7 @@ namespace NyaIme
 
         private void ToggleAlphaMode()
         {
+            ResetAlphabetShift();
             FlushRomaji();
             FinishCurrentConversionSegment();
             _halfWidthAlphaMode =
@@ -2065,6 +2005,9 @@ namespace NyaIme
                     Backspace),
                 VerticalWeighted());
 
+            if (_halfWidthAlphaMode && !_numericMode)
+                column.AddView(CreateShiftKey(), VerticalWeighted());
+
             column.AddView(
                 CreateFunctionKey(
                     "▶",
@@ -2084,6 +2027,56 @@ namespace NyaIme
                 VerticalWeighted());
 
             return column;
+        }
+
+        private Button CreateShiftKey()
+        {
+            _shiftKey = CreateFunctionKey("", () =>
+            {
+                _alphabetShift.Cycle();
+                RefreshAlphabetShift();
+            });
+            _shiftKey.TextSize = 14;
+            _shiftKey.SetAllCaps(false);
+            _shiftKey.SetSingleLine(false);
+            _shiftKey.SetMaxLines(2);
+            _shiftKey.SetMinWidth(0);
+            _shiftKey.SetMinHeight(0);
+            RefreshAlphabetShift();
+            return _shiftKey;
+        }
+
+        private void ResetAlphabetShift()
+        {
+            _alphabetShift.Reset();
+            RefreshAlphabetShift();
+        }
+
+        private void RefreshAlphabetShift()
+        {
+            foreach (var (label, letter) in _alphabetLabels)
+                label.Text = _alphabetShift.Display(letter);
+            if (_shiftKey is null) return;
+            _shiftKey.Text = _alphabetShift.Mode switch
+            {
+                AlphabetShiftState.ShiftMode.Once => "⇧\nABC",
+                AlphabetShiftState.ShiftMode.CapsLock => "⇪\nABC",
+                _ => "⇧\nabc"
+            };
+            _shiftKey.ContentDescription = _alphabetShift.Mode switch
+            {
+                AlphabetShiftState.ShiftMode.Once => "Shift: 次の1文字を大文字。タップで大文字固定",
+                AlphabetShiftState.ShiftMode.CapsLock => "Caps Lock: 大文字固定。タップで解除",
+                _ => "Shift: 小文字。タップで次の1文字を大文字"
+            };
+            _shiftKey.SetBackgroundColor(_alphabetShift.Mode switch
+            {
+                AlphabetShiftState.ShiftMode.Once => Color.Rgb(190, 218, 240),
+                AlphabetShiftState.ShiftMode.CapsLock => Color.Rgb(50, 100, 150),
+                _ => Color.Rgb(235, 239, 242)
+            });
+            _shiftKey.SetTextColor(_alphabetShift.Mode == AlphabetShiftState.ShiftMode.CapsLock
+                ? Color.White : Color.Rgb(70, 90, 100));
         }
 
         // =========================================================

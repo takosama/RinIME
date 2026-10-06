@@ -1,6 +1,8 @@
 # RinIME for Android
 
-C# / .NET 10 Android IME with offline kana-kanji conversion using Mozc dictionary data. Includes cursor editing, partial candidate confirmation, and raw-text confirmation with Enter (version 1.5).
+C# / .NET 10 Android IME with offline kana-kanji conversion using Mozc dictionary data. Includes cursor editing, partial candidate confirmation, and raw-text confirmation with Enter (version 1.6).
+
+In half-width alphabet mode, tap Shift once for the next capital, twice for Caps Lock, and again to unlock. Labels and flick previews follow the input case. Symbols, deletion, space and Enter retain pending Shift; switching input modes or ending the input session resets it. The O vowel key (お in romaji mode) now has a half-width `@` down flick.
 
 ## Build and test
 

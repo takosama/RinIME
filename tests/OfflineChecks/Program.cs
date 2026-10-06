@@ -331,4 +331,5 @@ using (var noKeyClient = new KanaKanjiClient(() => ""))
     var noKeyCandidates = await noKeyClient.GetCandidatesStreamingAsync("test", _ => { notified = true; return true; }, CancellationToken.None);
     Check(noKeyCandidates.Count == 0 && !notified, "missing credentials returns fallback without HTTP or callback");
 }
-Console.WriteLine($"FINAL: {passed} assertions passed, including credential-free publication behavior.");
+KeyboardRegressionChecks.Run(Check);
+Console.WriteLine($"FINAL: {passed} assertions passed, including keyboard Shift/flick and credential-free publication behavior.");

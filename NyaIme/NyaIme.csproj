@@ -7,8 +7,8 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 
 		<ApplicationId>com.companyname.Nyalme</ApplicationId>
-		<ApplicationVersion>6</ApplicationVersion>
-		<ApplicationDisplayVersion>1.5</ApplicationDisplayVersion>
+		<ApplicationVersion>7</ApplicationVersion>
+		<ApplicationDisplayVersion>1.6</ApplicationDisplayVersion>
 
 		<TrimMode>full</TrimMode>
 		<Platforms>AnyCPU;ARM32;x86</Platforms>
